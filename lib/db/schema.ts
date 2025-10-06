@@ -4,6 +4,7 @@ import { relations } from 'drizzle-orm';
 
 // Enums
 export const settlementStatusEnum = pgEnum('settlement_status', ['pending', 'completed']);
+export const categoryTypeEnum = pgEnum('category_type', ['default', 'custom']);
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -66,6 +67,21 @@ export const verifications = pgTable("verifications", {
     .notNull(),
 });
 
+// Categories table
+export const categories = pgTable('categories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  description: text('description'),
+  color: text('color').notNull().default('#6B7280'), // Default gray color
+  icon: text('icon'), // Optional icon identifier
+  type: categoryTypeEnum('type').notNull().default('custom'),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }), // null for default categories
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
 
 // Friends table
 export const friends = pgTable('friends', {
@@ -98,6 +114,7 @@ export const expenses = pgTable('expenses', {
   description: text('description').notNull(),
   amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
   paidBy: text('paid_by').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }), // null if no category
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -129,6 +146,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   expenseSplits: many(expenseSplits),
   settlementsFrom: many(settlements, { relationName: 'fromUser' }),
   settlementsTo: many(settlements, { relationName: 'toUser' }),
+  categories: many(categories),
 }));
 
 export const friendsRelations = relations(friends, ({ one }) => ({
@@ -162,6 +180,13 @@ export const eventParticipantsRelations = relations(eventParticipants, ({ one })
   }),
 }));
 
+export const categoriesRelations = relations(categories, ({ one }) => ({
+  user: one(users, {
+    fields: [categories.userId],
+    references: [users.id],
+  }),
+}));
+
 export const expensesRelations = relations(expenses, ({ one, many }) => ({
   event: one(events, {
     fields: [expenses.eventId],
@@ -170,6 +195,10 @@ export const expensesRelations = relations(expenses, ({ one, many }) => ({
   paidBy: one(users, {
     fields: [expenses.paidBy],
     references: [users.id],
+  }),
+  category: one(categories, {
+    fields: [expenses.categoryId],
+    references: [categories.id],
   }),
   splits: many(expenseSplits),
 }));
