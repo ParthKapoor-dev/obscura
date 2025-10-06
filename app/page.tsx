@@ -5,9 +5,8 @@ import { trpc } from '@/lib/trpc/client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { ExpenseSummary } from '@/components/expense/expense-summary';
-import { ExpenseList } from '@/components/expense/expense-list';
-import { FriendsList } from '@/components/friends/friends-list';
-import { EventsList } from '@/components/events/events-list';
+import { DollarSign, Calendar, Users } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function Home() {
   const { data: session, isPending } = useSession();
@@ -71,37 +70,60 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0 space-y-8">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
-              Expense Dashboard
-            </h2>
-            <ExpenseSummary />
-          </div>
-          
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
-              All Expenses
-            </h2>
-            <ExpenseList />
-          </div>
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0 space-y-8">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-6">
+                Dashboard
+              </h1>
+              <ExpenseSummary />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push('/expenses')}>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 rounded-full bg-primary/10">
+                      <DollarSign className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Personal Expenses</h3>
+                      <p className="text-sm text-muted-foreground">Track individual spending</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
-              Friends
-            </h2>
-            <FriendsList />
-          </div>
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push('/events')}>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 rounded-full bg-secondary/10">
+                      <Calendar className="h-5 w-5 text-secondary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Events & Trips</h3>
+                      <p className="text-sm text-muted-foreground">Split bills with friends</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
-              Events
-            </h2>
-            <EventsList />
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push('/friends')}>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 rounded-full bg-accent/10">
+                      <Users className="h-5 w-5 text-accent-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Friends</h3>
+                      <p className="text-sm text-muted-foreground">Manage your contacts</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
     </div>
   );
 }

@@ -28,7 +28,7 @@ import {
   AlertCircle,
   CheckCircle2
 } from 'lucide-react';
-import { ExpenseForm } from '@/components/expense/expense-form';
+import { EventExpenseForm } from '@/components/expense/event-expense-form';
 import { EventExpenseList } from './event-expense-list';
 import { EventBalanceView } from './event-balance-view';
 
@@ -259,7 +259,8 @@ export function EventDetailsDialog({ eventId, open, onOpenChange }: EventDetails
         </Tabs>
 
         {showAddExpense && (
-          <ExpenseForm
+          <EventExpenseForm
+            eventId={eventId}
             onSuccess={handleFormSuccess}
             onCancel={handleFormCancel}
             initialData={editingExpense ? {
@@ -267,20 +268,11 @@ export function EventDetailsDialog({ eventId, open, onOpenChange }: EventDetails
               description: editingExpense.description,
               amount: parseFloat(editingExpense.amount),
               categoryId: editingExpense.category?.id,
-              eventId: eventId,
               splits: editingExpense.splits?.map((split: any) => ({
                 userId: split.user.id,
                 share: parseFloat(split.share),
               })) || [],
-            } : {
-              description: '',
-              amount: 0,
-              eventId: eventId,
-              splits: event.participants.map(p => ({
-                userId: p.user.id,
-                share: 0,
-              })),
-            }}
+            } : undefined}
           />
         )}
       </DialogContent>
